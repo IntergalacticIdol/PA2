@@ -1,4 +1,3 @@
-import mysql.connector
 import queries as q
 import ui
 

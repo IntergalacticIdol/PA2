@@ -32,6 +32,7 @@ class databaseConnector:
           # it will be created
           # it is also likely the first time the app is being run
           self.createDb()
+          self.dummyEntries()
 
 
   def createDb(self):
@@ -41,6 +42,9 @@ class databaseConnector:
       tables = [
         "CREATE TABLE Games(" +
         "name varchar(64) NOT NULL UNIQUE," +
+        "release_date date," +
+        "developer varchar(32)," +
+        "publisher varchar(32)," +
         "PRIMARY KEY (name))",
 
         "CREATE TABLE Tags(" +
@@ -59,7 +63,6 @@ class databaseConnector:
 
         "CREATE TABLE Players(" +
         "name varchar(16) NOT NULL UNIQUE," +
-        "image varchar(128)," +
         "PRIMARY KEY (name))",
 
         "CREATE TABLE Game_copies(" +
@@ -79,24 +82,9 @@ class databaseConnector:
 
       self.connection.commit()
 
-  def dummyEntries():
-    entries = [
-      # games
-      [],
-      # tags
-      [],
-      # assigned tags
-      [],
-      # players
-      [],
-      # game copies
-      []
-    ]
-
-  def addGame(self, name):
+  def addGame(self, name, date, dev, pub):
     self.cursor.execute("USE pa2")
-    self.cursor.execute(f"INSERT INTO Games (name) VALUES ('{name}')")
-    print("Game has been added")
+    self.cursor.execute(f"INSERT INTO Games (name, release_date, developer, publisher) VALUES ('{name}', '{date}', '{dev}', '{pub}')")
     self.connection.commit()
 
   # TODO: INPUT IMAGE IN TOO
@@ -185,7 +173,7 @@ class databaseConnector:
       result[x] = self.alphaFilter(result[x])
     return result
 
-  # Returns player profile data: name and owned games count
+  # Returns player profile data: owned games count
   def queryB(self, player):
     query = f"SELECT COUNT(g.game_name) FROM Game_copies AS g WHERE owner = '{player}'"
     self.cursor.execute(query)
@@ -220,3 +208,142 @@ class databaseConnector:
     for x in range(len(result)):
       result[x] = self.alphaFilter(result[x])
     return result
+
+  def dummyEntries(self):
+    tables = [
+      [
+        ("Idle",),
+        ("Chompy",),
+        ("Bunny",),
+        ("Jynx",),
+        ("Alice",),
+        ("Bread",)
+      ],
+
+      [
+        ('Stardew Valley', '2016-02-26', 'ConcernedApe', 'ConcernedApe'),
+        ('Valheim', '2021-02-02', 'Iron Gate AB', 'Coffee Stain Publishing'),
+        ('Devour', '2021-01-28', 'Straight Back Games', 'Straight Back Games'),
+        ('Pummel Party', '2018-09-20', 'Rebuilt Games', 'Rebuilt Games'),
+        ('Dead by Daylight', '2016-01-14', 'Behaviour Interactive Inc.', 'Behaviour Interactive Inc.'),
+        ('Dont Starve Together', '2016-04-21', 'Klei Entertainment', 'Klei Entertainment'),
+        ('Terraria', '2011-05-16', 'Re-Logic', 'Re-Logic'),
+        ('Phasmophobia', '2020-09-18', 'Kinetic Games', 'Kinetic Games'),
+        ('Raft', '2018-05-23', 'Redbeet Interactive', 'Axolot games'),
+        ('Worms Revolution', '2012-10-10', 'Team17 Digital Ltd', 'Team17 Digital Ltd')
+      ],
+
+      [
+        ('Pixel Graphics',),
+        ('RPG',),
+        ('Relaxing',),
+        ('Simulation',),
+        ('Sandbox',),
+        ('Indie',),
+        ('Casual',),
+        ('Open World',),
+        ('2D',),
+        ('Cute',),
+        ('Survival',),
+        ('Horror',),
+        ('Atmospheric',),
+        ('Puzzle',),
+        ('Party',),
+        ('Exploration',)
+      ],
+
+      [
+        ('Stardew Valley', 'Pixel Graphics'),
+        ('Stardew Valley', 'RPG'),
+        ('Stardew Valley', 'Relaxing'),
+        ('Stardew Valley', 'Simulation'),
+        ('Stardew Valley', 'Sandbox'),
+        ('Stardew Valley', 'Indie'),
+        ('Stardew Valley', 'Casual'),
+        ('Stardew Valley', 'Cute'),
+        ('Stardew Valley', '2D'),
+        ('Valheim', 'RPG'),
+        ('Valheim', 'Sandbox'),
+        ('Valheim', 'Survival'),
+        ('Valheim', 'Exploration'),
+        ('Valheim', 'Open World'),
+        ('Valheim', 'Indie'),
+        ('Devour', 'Horror'),
+        ('Devour', 'Survival'),
+        ('Devour', 'Puzzle'),
+        ('Devour', 'Indie'),
+        ('Pummel Party', 'Casual'),
+        ('Pummel Party', 'Party'),
+        ('Pummel Party', 'Indie'),
+        ('Dead by Daylight', 'Horror'),
+        ('Dead by Daylight', 'Survival'),
+        ('Dead by Daylight', 'Atmospheric'),
+        ('Dont Starve Together', 'Exploration'),
+        ('Dont Starve Together', 'Open World'),
+        ('Dont Starve Together', 'Survival'),
+        ('Dont Starve Together', '2D'),
+        ('Dont Starve Together', 'Atmospheric'),
+        ('Terraria', '2D'),
+        ('Terraria', 'Sandbox'),
+        ('Terraria', 'Survival'),
+        ('Terraria', 'Exploration'),
+        ('Terraria', 'Pixel Graphics'),
+        ('Terraria', 'Indie'),
+        ('Terraria', 'RPG'),
+        ('Phasmophobia', 'Horror'),
+        ('Phasmophobia', 'Indie'),
+        ('Raft', 'Survival'),
+        ('Raft', 'Open World'),
+        ('Raft', 'Sandbox'),
+        ('Raft', 'Indie')
+      ],
+
+      [
+        ('Chompy', 'Stardew Valley'),
+        ('Idle', 'Stardew Valley'),
+        ('Jynx', 'Stardew Valley'),
+        ('Chompy', 'Valheim'),
+        ('Jynx', 'Valheim'),
+        ('Chompy', 'Devour'),
+        ('Idle', 'Devour'),
+        ('Jynx', 'Devour'),
+        ('Chompy', 'Pummel Party'),
+        ('Idle', 'Pummel Party'),
+        ('Jynx', 'Pummel Party'),
+        ('Alice', 'Dead by Daylight'),
+        ('Chompy', 'Dead by Daylight'),
+        ('Idle', 'Dead by Daylight'),
+        ('Jynx', 'Dead by Daylight'),
+        ('Bunny', 'Dead by Daylight'),
+        ('Alice', 'Dont Starve Together'),
+        ('Bread', 'Dont Starve Together'),
+        ('Idle', 'Dont Starve Together'),
+        ('Chompy', 'Dont Starve Together'),
+        ('Jynx', 'Dont Starve Together'),
+        ('Chompy', 'Terraria'),
+        ('Idle', 'Terraria'),
+        ('Bread', 'Terraria'),
+        ('Chompy', 'Phasmophobia'),
+        ('Jynx', 'Phasmophobia'),
+        ('Idle', 'Phasmophobia'),
+        ('Bunny', 'Phasmophobia'),
+        ('Chompy', 'Raft'),
+        ('Idle', 'Raft'),
+        ('Jynx', 'Raft'),
+        ('Chompy', 'Worms Revolution'),
+        ('Bunny', 'Worms Revolution'),
+        ('Alice', 'Worms Revolution'),
+        ('Idle', 'Worms Revolution'),
+        ('Bread', 'Worms Revolution')
+      ]
+    ]
+
+    self.cursor.execute("USE pa2")
+
+    self.cursor.executemany("INSERT INTO Players (name) VALUES (%s)", tables[0])
+    self.cursor.executemany("INSERT INTO Games VALUES (%s, %s, %s, %s)", tables[1])
+    self.cursor.executemany("INSERT INTO Tags (name) VALUES (%s)", tables[2])
+    self.cursor.executemany("INSERT INTO Assigned_tags (game_name, tag_name) VALUES (%s, %s)", tables[3])
+    self.cursor.executemany("INSERT INTO Game_copies (owner, game_name) VALUES (%s, %s)", tables[4])
+
+    self.connection.commit()

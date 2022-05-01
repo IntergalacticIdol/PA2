@@ -1,7 +1,5 @@
-from termios import PARODD
 import tkinter as tk
 import tkinter.ttk as ttk
-from turtle import width
 import queries as q
 
 class uiManager:
@@ -27,7 +25,7 @@ class uiManager:
     mainStyle.configure('TButton', background='#2958a3', borderwidth=5)
     mainStyle.map('TButton', background=[('!active', '#3669ba')])
     mainStyle.configure('TFrame', background='#5a94f2', relief='ridge')
-    mainStyle.configure('TCheckbutton', background='#5a94f2', indicatorbackground='#2958a3', anchor=tk.W, width=13)
+    mainStyle.configure('TCheckbutton', background='#5a94f2', indicatorbackground='#2958a3', anchor=tk.W, width=16)
     mainStyle.configure('TLabel', width=32, background='white')
 
     # Menubar
@@ -134,7 +132,7 @@ class uiManager:
   def createLeftPanel(self, parent):
     # initially creates the list and fills it in
     if (self.listBox == None):
-      self.listBox = tk.Listbox(parent, width=17, height=38, selectmode=tk.SINGLE)
+      self.listBox = tk.Listbox(parent, width=19, height=38, selectmode=tk.SINGLE)
       self.listBox.grid(columnspan=2)
       self.listBox.delete(0, tk.END)
       gameList = self.dbConnector.getGameTitles()
@@ -170,38 +168,54 @@ class uiManager:
       listBox.insert(tk.END, game)
 
   def addGamePopUp(self, parent):
-    top = tk.Toplevel(parent)
-    top.geometry("300x300")
+    top = tk.Toplevel(parent, bg='#5a94f2', bd=5, relief='ridge')
+    top.geometry("210x390")
     top.title("Add a game")
 
     ttk.Label(top, text='Game title: ').pack()
-    nameBox = ttk.Entry(top)
+    nameBox = ttk.Entry(top, width=32)
     nameBox.pack()
+
+    ttk.Label(top, text='Release date: ').pack()
+    dateBox = ttk.Entry(top, width=32)
+    dateBox.insert(0, 'yyyy-mm-dd')
+    dateBox.pack()
+
+    ttk.Label(top, text='Developer: ').pack()
+    devBox = ttk.Entry(top, width=32)
+    devBox.pack()
+
+    ttk.Label(top, text='Publisher: ').pack()
+    pubBox = ttk.Entry(top, width=32)
+    pubBox.pack()
 
     tagList = []
     for x in self.dbConnector.getTags():
       tagList.append(x)
 
     ttk.Label(top, text='Tags: ').pack()
-    listBox = tk.Listbox(top, selectmode=tk.MULTIPLE)
+    yScroll = tk.Scrollbar(top)
+    yScroll.pack(side=tk.RIGHT, fill=tk.Y)
+    listBox = tk.Listbox(top, width=30, selectmode=tk.MULTIPLE, yscrollcommand=yScroll.set)
     for x in tagList:
       listBox.insert(tk.END, x)
     listBox.pack()
+    yScroll.config(command=listBox.yview)
 
     def onClick():
-      self.dbConnector.addGame(nameBox.get())
+      self.dbConnector.addGame(nameBox.get(), dateBox.get(), devBox.get(), pubBox.get())
       for x in listBox.curselection():
         self.dbConnector.addAssigned(nameBox.get(), listBox.get(x))
 
-    confirm = ttk.Button(top, text='Add', command=lambda: onClick()).pack()
+    confirm = ttk.Button(top, text='Add', width=30, command=lambda: onClick()).pack()
 
   def addPlayerPopUp(self, parent):
-    top = tk.Toplevel(parent)
-    top.geometry("300x300")
+    top = tk.Toplevel(parent, bg='#5a94f2', bd=5, relief='ridge')
+    top.geometry("210x85")
     top.title("Add a Player")
 
     ttk.Label(top, text='Player name: ').pack()
-    nameBox = ttk.Entry(top)
+    nameBox = ttk.Entry(top, width=32)
     nameBox.pack()
 
     # image select
@@ -209,19 +223,19 @@ class uiManager:
     confirm = ttk.Button(top, text='Add', command=lambda: self.dbConnector.addPlayer(nameBox.get())).pack()
 
   def addTagPopUp(self, parent):
-    top = tk.Toplevel(parent)
-    top.geometry("300x300")
+    top = tk.Toplevel(parent, bg='#5a94f2', bd=5, relief='ridge')
+    top.geometry("210x85")
     top.title("Add a Tag")
 
     ttk.Label(top, text='Tag name: ').pack()
-    nameBox = ttk.Entry(top)
+    nameBox = ttk.Entry(top, width=32)
     nameBox.pack()
 
     confirm = ttk.Button(top, text='Add', command=lambda: self.dbConnector.addTag(nameBox.get())).pack()
 
   def addGameCopyPopUp(self, parent):
-    top = tk.Toplevel(parent)
-    top.geometry("300x300")
+    top = tk.Toplevel(parent, bg='#5a94f2', bd=5, relief='ridge')
+    top.geometry("210x125")
     top.title("Add a Game Copy")
 
     playerList = []
@@ -229,7 +243,7 @@ class uiManager:
       playerList.append(x)
 
     ttk.Label(top, text='Player: ').pack()
-    playerBox = ttk.Combobox(top, values=playerList)
+    playerBox = ttk.Combobox(top, values=playerList, width=30)
     playerBox.pack()
 
     gameList = []
@@ -237,7 +251,7 @@ class uiManager:
       gameList.append(x)
 
     ttk.Label(top, text='Game title: ').pack()
-    gameBox = ttk.Combobox(top, values=gameList)
+    gameBox = ttk.Combobox(top, values=gameList, width=30)
     gameBox.pack()
 
     confirm = ttk.Button(top, text='Add to a player inventory', 
@@ -256,9 +270,9 @@ class uiManager:
     for element in playerData[1]:
       temp += element + ' '
 
-    ttk.Label(top, text=f'Username: {playerData[2]}').pack()
-    ttk.Label(top, text=f'Games owned: {playerData[0]}').pack()
-    ttk.Label(top, text=f'Favourite tags: {temp}').pack()
+    ttk.Label(top, text=f'Username: {playerData[2]}').pack(fill=tk.X)
+    ttk.Label(top, text=f'Games owned: {playerData[0]}').pack(fill=tk.X)
+    ttk.Label(top, text=f'Favourite tags: {temp}').pack(fill=tk.X)
 
   def showGame(self, parent, game):
     top = tk.Toplevel(parent, bg='#5a94f2', bd=5, relief='ridge')
